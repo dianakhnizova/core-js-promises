@@ -65,9 +65,9 @@ function getFirstResolvedPromiseResult(promises) {
     const promiseLength = promises.length;
 
     promises.forEach((promise) => {
-      resolve(promise)
+      promise
         .then((value) => {
-          resolve(`Promise fulfilled with ${value}`);
+          resolve(value);
         })
         .catch(() => {
           count += 1;
@@ -113,8 +113,26 @@ function getFirstPromiseResult(promises) {
  * [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)] => Promise fulfilled with [1, 2, 3]
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)] => Promise rejected with 2
  */
-function getAllOrNothing(/* promises */) {
-  throw new Error('Not implemented');
+function getAllOrNothing(promises) {
+  return new Promise(function myPromise(resolve, reject) {
+    const result = [];
+    let completed = 0;
+    const promiseLength = promises.length;
+
+    promises.forEach((promise, index) => {
+      Promise.resolve(promise)
+        .then((value) => {
+          result[index] = value;
+          completed += 1;
+          if (completed === promiseLength) {
+            resolve(result);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  });
 }
 
 /**
